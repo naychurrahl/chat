@@ -14,14 +14,6 @@
 
 
   if (isset($_GET['message'])){
-    // To test the mechanics of the framework
-    //$_COOKIE["raw"] = rand(0, 300);
-    //setcookie("raw", rand(0, 300), ["expires" => time() + (7), "samesite" => "none", "secure" => "secure"]);
-    // One of the mechanics for the main program
-    //setcookie("key", json_encode(["public" => "21", "private" => "32"]), ["expires" => time() + (10), "samesite" => "none", "secure" => "secure"]);
-    //setcookie("keys", json_encode(["alias" => "agent 007", "address" => "54"]), ["expires" => time() + (10), "samesite" => "none", "secure" => "secure"]);
-    //$_SESSION["key"]  = json_encode(["public" => "21", "private" => "32"]);
-    //$_SESSION["keys"] = json_encode(["alias" => "agent ".rand(99, 999), "address" => "54"]);
     
     ///////////////////////////////////////////  Variable declaration  ///////////////////////////////////////////////////////////////////
       
@@ -62,13 +54,13 @@
       switch ($return["code"]) {
         case 200:
           foreach ($return["message"] as $value) {
-            //$sender = $value["sender"];
             $message = $value["message"];
             $message = base64_decode(pubkeydecrypt(base64_decode($message), $key['private']));
             $time = $value["time"];
             $text[] = ["sender" => "receiver", "message" => $message, "time" => $time];
             
             /////////////// Delete sequence ///////////////////////
+              
               $message_id = $value["id"];
               $delete = database_delete_data($con, $table['a'], "id", $message_id);
               $end[] = ["message" => $message, "time" => $time,];// "delete" => $delete['code']]; 
@@ -76,7 +68,6 @@
             /////////////// Delete sequence ///////////////////////
             
           }
-          $_SESSION["texts"] = json_encode($text);
           break;
         
         default:
@@ -92,8 +83,10 @@
     do {
       $send = database_insert_unique($con, $table['a'], ["id" => rand(999, 9999),"reciver" => $target_id, "message" => $message, "time" => $_POST['time']]);
     } while ($send['code'] !== 200);
-    $text[] = ["sender" => "sender", "message" => $message, "time" => $_POST['time']];
+    $text[] = ["sender" => "sender", "message" => $_POST['text'], "time" => $_POST['time']];
     echo json_encode($send['code']);
   }
+
+  $_SESSION["texts"] = json_encode($text);
 
 ?>
