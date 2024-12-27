@@ -1,5 +1,7 @@
 <?php
 
+  require_once("variables.php");
+
   $hostname = "localhost";
   $username = "root";
   $password = "";

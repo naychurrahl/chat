@@ -1,23 +1,17 @@
 <?php
-  session_start([ 
-    'cookie_path' => '/',
-    'cookie_secure' => true,
-    'cookie_samesite' => 'none',
-  ]);
+
+  require_once("./includes/php/functions.php");
+  session_start(['cookie_path' => '/', 'cookie_secure' => true, 'cookie_samesite' => 'none']);
   if(isset($_SESSION["init"]) & $_SESSION["init"] == "auth" & isset($_SESSION['texts'])){
     ///////////////////// Variable Declaration ////////////////////////////////
       
-      $keys = json_decode($_SESSION["keys"], true);
-      $target = $keys[0];
-      $key = json_decode($_SESSION["key"], true);
+      $text = json_decode($_SESSION["texts"], true);
 
     ///////////////////// Variable Declaration ////////////////////////////////
-    
-    ///////////////////// Somethin ////////////////////////////////
   } else {
-    //header("location: init.php");
-    $keys = "Guess not";
+    header("location: ./init/");
   }
+  
 ?>
 
 <!DOCTYPE html>
@@ -31,61 +25,13 @@
     <link rel="stylesheet" href="./includes/css/bootstrap.css" >
     <link rel="stylesheet" href="./includes/css/index.css" >
   </head>
-  
   <body>
     <div class="container" >
       <div class="row">
         <div class="col-12">
           <div class="single-chat-tab">
             <div class="chat-body" id="ye">
-              <!--div class="message-content receiver">
-                <label for="">11:33 PM, Yesterday</label>
-                <div class="msg-block">
-                  <p>
-                    bibendum egestas augue.Duis sit amet ante feugiat enim viverra sagittis.
-                  </p>
-                </div>
-              </div>
-              <div class="message-content sender">
-                <label for="">11:33 PM, Yesterday</label>
-                <div class="msg-block">
-                  <p>
-                    bibendum egestas augue.Duis sit amet ante feugiat enim viverra sagittis.
-                  </p>
-                </div>
-              </div>
-              <div class="message-content sender">
-                <label for="">11:33 PM, Yesterday</label>
-                <div class="msg-block">
-                  <p>
-                    bibendum egestas augue.Duis sit amet ante feugiat enim viverra sagittis.
-                  </p>
-                </div>
-              </div>
-              <div class="message-content sender">
-                <label for="">11:33 PM, Yesterday</label>
-                <div class="msg-block">
-                  <p>
-                    b
-                  </p>
-                </div>
-              </div>
-              <div class="message-content receiver">
-                <label for="">11:33 PM, Yesterday</label>
-                <div class="msg-block">
-                  <p>
-                    Last from the other side
-                  </p>
-                </div>
-              </div>
-              <div class="message-content sender">
-                <label for="">11:33 PM, Yesterday</label>
-                <div class="msg-block">
-                  <p>
-                    Come
-                  </p>
-                </div>
-              </div-->
+              <?php foreach ($text as $value) {echo textNode($value['message'], $value['time'], $value['sender']);}?>
             </div>
             <div class="chat-footer">
               <div class="input-group md-form form-sm form-2 pl-0">
@@ -101,106 +47,108 @@
         </div>
       </div>
     </div>
-</body>
+  </body>
   <script>
 
-    let lynk = './sand/message.php';
-    let refreshRate = 5000;
-   /////////////////////////////   Don't Touch  /////////////////////////
-    setInterval(function(){
-      fetchMovies();
-    }, refreshRate);
-   /////////////////////////////   Don't touch  /////////////////////////
+    const lynks = {
+      refreshRate: 1000,
+      validation: "./api/",
+    };
 
-    var input = document.getElementById("input");
-    input.addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        document.getElementById("basic-text1").click();
-      }
-    });
+    /////////////////////////////  Don't Touch  /////////////////////////
+      setInterval(function(){
+        fetchMovies();
+      }, lynks.refreshRate);
 
-   ///////////////////////////// Main character //////////////////////////////////////////
-    async function fetchMovies() {
-      const response = await fetch(lynk+"?message");
-      const movies = await response.json();
-
-      console.log(movies);
-      switch (movies.code) {
-       case "200":
-          const messages = movies.message;
-          Object.entries(messages).forEach(([key, val]) => {
-            createTextNode(val.time, val.message, "receiver");
-          });
-          break;
-        default:
-          console.log("now here");
-          break;
-      }
-    }
-   ///////////////////////////// Main character //////////////////////////////////////////
-
-   ///////////////////////////// Side character //////////////////////////////////////////
-    function getCookie(cookieName) {
-      const cookies = document.cookie.split('; ');
-      for (const cookie of cookies) {
-        const [name, value] = cookie.split('=');
-        if (name === cookieName) {
-          return decodeURIComponent(value);
+      var input = document.getElementById("input");
+      input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          document.getElementById("basic-text1").click();
         }
-      }
-      return null;
-    }
+      });
+    /////////////////////////////  Don't touch  /////////////////////////
 
-    function createTextNode(time_text, text, sender){
-      const attribute = "message-content " + sender
-      const element = document.getElementById("ye");
- 
-      const cont = document.createElement("div")
-      const labe = document.createElement("label")
-      const blok = document.createElement("div")
-      const para = document.createElement("p")
-      const abel = document.createTextNode(time_text);
-      const grap = document.createTextNode(text);
-      labe.appendChild(abel);
-      para.appendChild(grap);
-      blok.appendChild(para);
-      blok.setAttribute("class", "msg-block");
-      cont.appendChild(labe);
-      cont.appendChild(blok);
-      cont.setAttribute("class", attribute);
-      element.appendChild(cont);
-
-      let elements = document.querySelector('div#ye > div:last-of-type');
-      elements.scrollIntoView(true);
-    }
-   ///////////////////////////// Side character ////////////////////////////////////////// 
-   
-   ///////////////////////////// Send //////////////////////////////////////////
-    async function onSend(params) {
-      let tyme = 0;
-      let messanger = document.getElementById("input");
-      let message = messanger.value;
-      messanger.value = "";
-      let data = {
-        send:"send",
-      }
-
-      if (message.length > 0){
-        const t = new Date();
-        let tyme = t.getTime();
-        let mess = "send=send&text="+message+"&time="+tyme;
-        const response = await fetch(lynk, {
+    ///////////////////////////// Main character ////////////////////////
+      async function fetchMovies() {
+        let mess = "action=hermes";
+        const response = await fetch(lynks.validation, {
           method: 'POST',
           body: new URLSearchParams(mess)
         });
         const movies = await response.json();
 
-        console.log(movies);
-        createTextNode(tyme, message, "sender");
+        switch (movies.code) {
+          case 200:
+            const messages = movies.message;
+            Object.entries(messages).forEach(([key, val]) => {
+              createTextNode(val.time, val.message, "receiver");
+            });
+            break;
+          case 404:
+            break;
+          default:
+            console.log("Well!! you just witnessed shit happen.");
+            break;
+        }
       }
-    }
-   ///////////////////////////// Send ////////////////////////////////////////// 
+    ///////////////////////////// Main character ////////////////////////
+
+    ///////////////////////////// Side character ////////////////////////
+      function createTextNode(time_text, text, sender){
+        const attribute = "message-content " + sender
+        const element = document.getElementById("ye");
+  
+        const cont = document.createElement("div")
+        const labe = document.createElement("label")
+        const blok = document.createElement("div")
+        const para = document.createElement("p")
+        const abel = document.createTextNode(time_text);
+        const grap = document.createTextNode(text);
+
+        labe.appendChild(abel);
+        para.appendChild(grap);
+        blok.appendChild(para);
+        blok.setAttribute("class", "msg-block");
+        cont.appendChild(labe);
+        cont.appendChild(blok);
+        cont.setAttribute("class", attribute);
+        element.appendChild(cont);
+
+        let elements = document.querySelector('div#ye > div:last-of-type');
+        elements.scrollIntoView(true);
+      }
+    ///////////////////////////// Side character ////////////////////////
+    
+    ////////////////////////////////// Send /////////////////////////////
+      async function onSend(params) {
+        let messanger = document.getElementById("input");
+        let message = messanger.value.trim();
+
+        if (message.length > 0){
+          const t = new Date();
+          let tyme = t.getTime();
+          let mess = "action=hermes&text="+message+"&time="+tyme+"&send";
+          const response = await fetch(lynks.validation, {
+            method: 'POST',
+            body: new URLSearchParams(mess)
+          });
+          const movies = await response.json();
+
+          switch (movies.code) {
+            case 200:
+              createTextNode(tyme, message, "sender");
+              messanger.value = "";              
+              break;
+          
+            default:
+              console.log(movies.code);
+              alert("try again!");
+              break;
+          }
+        }
+      }
+    ////////////////////////////////// Send /////////////////////////////
 
   </script>
 </html>
