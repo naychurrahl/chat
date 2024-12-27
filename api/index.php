@@ -231,30 +231,6 @@
               $end        = [];
             //////////////// Variables ////////////////
             //////////////// SQL Query ////////////////
-
-              /*$sql  = "SELECT a.id, a.message, a.time ";
-              $sql .= " FROM {$table['messages']} ";/*AS a ";
-              $sql .= " LEFT JOIN {$table['users']} AS b ";
-              $sql .= " ON a.reciver = b.id ";* /
-              $sql .= " WHERE reciver = :rcver";
-              //$sql .= " WHERE b.ad = :rcver";
-              $sql .= " ORDER BY a.time ";
-              
-              try {
-                $stmt = $con->prepare($sql);
-                //$stmt->execute([":rcver" => $identifier]);
-                $stmt->execute([":rcver" => $key['id']]);
-                $database = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                if($database){
-                  $return = ["code" => 200, "message" => $database];
-                } else {
-                  $return = ["code" => 404, "message" => $database]; //empty
-                }
-              } catch (PDOException $e) {
-                $return = ["code" => 501, "message" => $e->getMessage()];
-              }*/
-
-            //////////////// SQL Query ////////////////
               
               $return = database_fetch_data(
                 $con,
@@ -312,9 +288,9 @@
   }
 
   echo(json_encode($die));
-  /*///////////////////// footer //////////////////////
+  ////////////////////// footer //////////////////////
     kron($con, $table['messages'], "time", time() - (60 * 10));
     kron($con, $table['init'], "time", time() - (60 * 15));
     kron($con, $table['users'], "time", time() - (60 * 20));
-  ////////////////////// footer /////////////////////*/
+  ////////////////////// footer //////////////////////
 ?>

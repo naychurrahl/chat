@@ -10,7 +10,6 @@
     ///////////////////// Variable Declaration ////////////////////////////////
   } else {
     header("location: ./init/");
-    $text = "Guess not";
   }
   
 ?>
@@ -59,7 +58,6 @@
     /////////////////////////////  Don't Touch  /////////////////////////
       setInterval(function(){
         fetchMovies();
-        //console.log("checked");
       }, lynks.refreshRate);
 
       var input = document.getElementById("input");
@@ -80,17 +78,14 @@
         });
         const movies = await response.json();
 
-        //console.log(movies.code);
         switch (movies.code) {
           case 200:
             const messages = movies.message;
-            //console.log(messages);
             Object.entries(messages).forEach(([key, val]) => {
               createTextNode(val.time, val.message, "receiver");
             });
             break;
           case 404:
-            //console.log("nothing yet");
             break;
           default:
             console.log("Well!! you just witnessed shit happen.");
