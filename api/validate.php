@@ -9,7 +9,7 @@
   ///////////////////////// Variable declaration ///////////////////////////////////
     
     $key = json_decode($_SESSION["key"], true);    
-    //$table = ["a" => "chat_init", "b" => "chat_users"];
+    $table = ["a" => "chat_init", "b" => "chat_users"];
     $constriant = "target";
     $identifier = base64_encode($key["public"]);
     $role = $_SESSION["role"];
@@ -18,7 +18,7 @@
 
   ////////////////////// SQL Statement /////////////////////////////////////////////////////////////////
     $sql  = "SELECT a.id, b.ad as target, a.message, a.time ";
-    $sql .= " FROM {$table['c']} AS a ";
+    $sql .= " FROM {$table['a']} AS a ";
     $sql .= " LEFT JOIN {$table['b']} AS b ";
     $sql .= " ON a.target = b.id ";
     $sql .= " WHERE b.ad = :ad";
@@ -39,7 +39,7 @@
   if ($return["code"] == 200){
     foreach ($return["message"] as $value) {
       $target = base64_decode(pubkeydecrypt(base64_decode($value["message"]), $key["private"]));
-      $delete = database_delete_data($con, $table['c'], "id", $value['id']);
+      $delete = database_delete_data($con, $table['a'], "id", $value['id']);
     }
     switch ($role) {
       case 'admin':
@@ -49,7 +49,7 @@
         $message = base64_encode(pubkeyencrypt(base64_encode("ack"), $otherAd));
         
         do{
-          $send = database_insert_unique($con, $table['c'], ["id" => rand(999, 9999), "target" => $target, "message" => $message, "time" => time()]);
+          $send = database_insert_unique($con, $table['a'], ["id" => rand(999, 9999), "target" => $target, "message" => $message, "time" => time()]);
         } while ($send['code'] == 402);
 
         if ($send["code"] == 200){

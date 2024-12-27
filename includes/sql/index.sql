@@ -1,6 +1,6 @@
 CREATE TABLE `chat_users` (
-  `id`   int(4)        NOT NULL AUTO_INCREMENT,
-  `ad`   varchar(2050) NOT NULL,
+  `id`   int(4)        NOT NULL,
+  `user` varchar(2050) NOT NULL,
   `time` varchar(16)   NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;

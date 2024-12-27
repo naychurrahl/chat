@@ -21,13 +21,13 @@
     return ["code" => 404, "message" => $first_check['message']];
   }
 
-  function database_fetch_data($con, $table, $constriant, $identifier, $columns = "*"){
+  function database_fetch_data($con, $table, $constriant, $identifier, $columns = "*", $all = False){
     $sql  = "SELECT {$columns} FROM {$table} ";
     $sql .= " WHERE {$constriant} = :{$constriant}";
     try {
       $stmt = $con->prepare($sql);
       $stmt->execute([":{$constriant}" => $identifier]);
-      $database = $stmt->fetch(PDO::FETCH_ASSOC);
+      $database = $all ? $stmt->fetchall(PDO::FETCH_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
       if($database){
         $return = ["code" => 200, "message" => $database];
       } else {
@@ -137,7 +137,7 @@
     return ["code" => 501, "message" => "update error -> ".$first_check['message']];
   }
 
-  function get_id($con, $tag, $table = "chat_users", $column = "id", $constriant = "ad"){
+  function get_id($con, $tag, $table = "chat_users", $column = "id", $constriant = "user"){
     $tag_id = database_fetch_data($con, $table, $constriant, $tag, $column);
     if ($tag_id['code'] == 200){
       return $tag_id['message'][$column];
@@ -145,6 +145,23 @@
       return "null";
     } else {
       return "error";
+    }
+  }
+
+  function initX($con, $table, $data, $range = [999, 9999]){
+    $data['id'] = rand($range[0], $range[1]);
+    $counter = 0;
+    do {
+      $add = database_insert_unique($con, $table, $data);
+      $counter++;
+    } while (($add['code'] !== 200) & ($counter < 10));
+
+    switch ($add['code']) {
+      case 200:
+        return ["code" => 200, "message" => $data['id']];
+      
+      default:
+        return ["code" => 400, "message" => "k{$counter}: {$add['message']}"];
     }
   }
 
@@ -174,12 +191,32 @@
     ];
   }
 
+  function kron($con, $table, $constriant, $identifier){
+    $sql  = "DELETE FROM {$table} ";
+    $sql .= " WHERE {$constriant} < :{$constriant}";
+
+    try {
+      $stmt = $con->prepare($sql);
+      $stmt->execute([":{$constriant}" => $identifier]);
+      $return = ["code" => 200, "message" => "ok"];
+    } catch (PDOException $e){
+      $return = ["code" => 501, "message" => $e->getMessage()];
+    } finally{
+      return $return;
+    }
+  }
+
+  function messageDecrypt($data, $sender, $key){
+    return prvkeydecrypt(pubkeydecrypt($data, $sender), $key);
+  }
+
   function messageEncrypt($data, $receiver, $key){
     return prvkeyencrypt(pubkeyencrypt($data, $receiver), $key);
   }
   
-  function messageDecrypt($data, $sender, $key){
-    return prvkeydecrypt(pubkeydecrypt($data, $sender), $key);
+  function prvkeydecrypt($data, $key){
+    openssl_public_decrypt($data, $Data, $key);
+    return $Data;
   }
 
   function prvkeyencrypt($data, $key){
@@ -187,8 +224,8 @@
     return $Data;
   }
 
-  function prvkeydecrypt($data, $key){
-    openssl_public_decrypt($data, $Data, $key);
+  function pubkeydecrypt($data, $key){
+    openssl_private_decrypt($data, $Data, $key);
     return $Data;
   }
 
@@ -197,9 +234,17 @@
     return $Data;
   }
 
-  function pubkeydecrypt($data, $key){
-    openssl_private_decrypt($data, $Data, $key);
-    return $Data;
+  function textNode($message, $time, $sender){
+    echo "
+      <div class=\"message-content {$sender}\">
+        <label for=\"\">{$time}</label>
+        <div class=\"msg-block\">
+          <p>
+            {$message}
+          </p>
+        </div>
+      </div>
+    ";
   }
 
 ?>

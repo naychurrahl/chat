@@ -9,7 +9,7 @@
 
     ///////////////////// Variable Declaration ////////////////////////////////
   } else {
-    header("location: ./init/");
+    header("location: init.php");
     $text = "Guess not";
   }
   
@@ -53,13 +53,12 @@
 
     const lynks = {
       refreshRate: 1000,
-      validation: "./api/",
+      validation: "./sand/message.php",
     };
 
     /////////////////////////////  Don't Touch  /////////////////////////
       setInterval(function(){
         fetchMovies();
-        //console.log("checked");
       }, lynks.refreshRate);
 
       var input = document.getElementById("input");
@@ -73,24 +72,16 @@
 
     ///////////////////////////// Main character ////////////////////////
       async function fetchMovies() {
-        let mess = "action=hermes";
-        const response = await fetch(lynks.validation, {
-          method: 'POST',
-          body: new URLSearchParams(mess)
-        });
+        const response = await fetch(lynks.validation+"?message");
         const movies = await response.json();
 
-        //console.log(movies.code);
+        console.log(movies.update);
         switch (movies.code) {
-          case 200:
+          case "200":
             const messages = movies.message;
-            //console.log(messages);
             Object.entries(messages).forEach(([key, val]) => {
               createTextNode(val.time, val.message, "receiver");
             });
-            break;
-          case 404:
-            //console.log("nothing yet");
             break;
           default:
             console.log("Well!! you just witnessed shit happen.");
@@ -129,28 +120,19 @@
       async function onSend(params) {
         let messanger = document.getElementById("input");
         let message = messanger.value.trim();
+        messanger.value = "";
 
         if (message.length > 0){
           const t = new Date();
           let tyme = t.getTime();
-          let mess = "action=hermes&text="+message+"&time="+tyme+"&send";
+          let mess = "send=send&text="+message+"&time="+tyme;
           const response = await fetch(lynks.validation, {
             method: 'POST',
             body: new URLSearchParams(mess)
           });
           const movies = await response.json();
 
-          switch (movies.code) {
-            case 200:
-              createTextNode(tyme, message, "sender");
-              messanger.value = "";              
-              break;
-          
-            default:
-              console.log(movies.code);
-              alert("try again!");
-              break;
-          }
+          createTextNode(tyme, message, "sender");
         }
       }
     ////////////////////////////////// Send /////////////////////////////

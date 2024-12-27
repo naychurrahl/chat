@@ -10,7 +10,7 @@
     
     $target     = json_decode($_SESSION["keys"], true)[0];
     $key        = json_decode($_SESSION["key"], true);
-    //$table      = ["a" => "chat_messages", "b" => "chat_users"];
+    $table      = ["a" => "chat_messages", "b" => "chat_users"];
     $text       = json_decode($_SESSION['texts'], true);
     $end        = [];
     $constriant = "reciver";
@@ -18,18 +18,15 @@
 
   ////////////////////////////////////////  Global Variable declaration  ///////////////////////////////////////////////////////////////////
 
-  do {
-    $userUpdate = database_update_data($con, $table['b'], ["time" => time() - (60 * 10)], "id", 3);
-  } while ($userUpdate['code'] != 200);
   if (isset($_GET['message'])){
     
     /////////////////////////////////////////////////  SQL Query  ///////////////////////////////////////////////////////////////////
       
       $sql  = "SELECT a.id, a.message, a.time ";
       $sql .= " FROM {$table['a']} AS a ";
-      $sql .= " LEFT JOIN {$table['b']} AS b ";
-      $sql .= " ON a.reciver = b.id ";
-      $sql .= " WHERE b.ad = :rcver";
+      $sql .= " LEFT JOIN {$table['b']} AS c ";
+      $sql .= " ON a.reciver = c.id ";
+      $sql .= " WHERE c.ad = :rcver";
       $sql .= " ORDER BY a.time ";
       
       try {
@@ -65,7 +62,7 @@
           break;
       }
       
-      echo (json_encode(["code" => "200", "message" => $end, "update" => $userUpdate['code']]));
+      echo (json_encode(["code" => "200", "message" => $end]));
     ////////////////////////////////////////////////////  ETC  ///////////////////////////////////////////////////////////////////
   
   } elseif (isset($_POST['send'])){
@@ -81,10 +78,7 @@
     echo json_encode($send['code']);
 
   }
+
   $_SESSION["texts"] = json_encode($text);
-  
-  kron($con, $table['a'], "time", time() - (60 * 10));
-  kron($con, $table['c'], "time", time() - (60 * 15));
-  kron($con, $table['b'], "time", time() - (60 * 20));
 
 ?>

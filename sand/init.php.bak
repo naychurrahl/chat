@@ -2,15 +2,42 @@
 
   session_start(['cookie_path' => '/', 'cookie_secure' => true, 'cookie_samesite' => 'none']);
   require_once("../includes/php/functions.php");
-  if (isset($_SESSION['init'])){
-    header("location: {$landing}");
-  } else {
-    if (isset($_GET['ad'])){
-      $mess = "action=init&sub={$_GET['ad']}&guest";
+  $ink = "http://127.0.0.1/dump/chat/sand/init.php?role=join&ad=";
+
+  if (!isset($_SESSION["role"])){
+    $key = kiis();
+    $_SESSION["key"] = json_encode($key);
+    do {
+      $add = database_insert_unique($con, "chat_users", ["ad" => base64_encode($key["public"]), "time" => time()]);
+      //$add = database_insert_unique($con, "chat_users", ["ad" => base64_encode($key["public"]), "time" => time(), "id" => rand(999, 9999)]);
+    } while ($add['code'] !== 200);
+  
+    if (isset($_GET["role"])){
+      switch (trim(strtolower($_GET["role"]))) {
+        case 'join':
+          $ad = base64_decode($_GET["ad"]);
+          $_SESSION["keys"] = json_encode([$ad]);
+          $_SESSION["role"] = "join";
+          $id = get_id($con, $_GET['ad']);
+          $message = base64_encode(pubkeyencrypt(base64_encode($add["message"]), $ad));
+          do{
+            $send = database_insert_unique($con, "chat_init", ["id" => rand(999, 9999), "target" => $id, "message" => $message, "time" => time()]);
+          } while ($send['code'] !==  200);
+          break;
+        
+        default:
+          $_SESSION["role"] = "admin";  
+          $link .= $ink.base64_encode($key["public"]);
+          break;
+      }
     } else {
-      $mess = "action=init";
+      $_SESSION["role"] = "admin";  
+      $link = $ink.base64_encode($key["public"]);
     }
+  } else {
+    $link = $ink.base64_encode(json_decode($_SESSION["key"], true)["public"]);
   }
+
 ?>
 
 <!DOCTYPE html>
@@ -21,51 +48,32 @@
     <title>Init</title>
   </head>
   <body>
-    <div id="b"></div>
-    </div>
+    <?php
+      echo isset($link) & $_SESSION["role"] === "admin" ? $link : "Waiting for admin";
+    ?>
   </body>
   <script>
 
     const lynks = {
-      refreshRate: 1000,
-      //landingPage: "../",
-      landingPage: "<?php echo $landing;?>",
-      init: "../api/",
-      mess: "<?php echo $mess;?>",
+      refreshRate: 3000,
+      landingPage: "../",
+      validation: "./init_message.php",
     };
    /////////////////////////////  Don't Touch  /////////////////////////
     setInterval(function(){
-        initiate();
-        //fetchMovies();
-      }, lynks.refreshRate);
+      fetchMovies();
+    }, lynks.refreshRate);
    /////////////////////////////  Don't touch  /////////////////////////
 
    ///////////////////////////// Main character //////////////////////////////////////////
-
-    async function initiate() {
-      let l = document.getElementById("b");
-      const response = await fetch(lynks.init, {
-        method: 'POST',
-        body: new URLSearchParams(lynks.mess)
-      });
+    async function fetchMovies() {
+      const response = await fetch(lynks.validation);
       const movies = await response.json();
-      switch (movies.code) {
-        case 200:
-          if (movies.message == "clear"){
-            location.href = lynks.landingPage;
-          }
-        case 209:
-          l.innerHTML = movies.message;
-          console.log("code: "+movies.code);
-          break;
-      
-        default:
-          console.log("not");
-          break;
+
+      if (movies.init === "ok") {
+        location.href = lynks.landingPage;
       }
-
     }
-
    ///////////////////////////// Main character //////////////////////////////////////////
 
    ///////////////////////////// Side character //////////////////////////////////////////

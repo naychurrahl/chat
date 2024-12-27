@@ -28,7 +28,6 @@
 
     const lynks = {
       refreshRate: 1000,
-      //landingPage: "../",
       landingPage: "<?php echo $landing;?>",
       init: "../api/",
       mess: "<?php echo $mess;?>",
@@ -36,7 +35,6 @@
    /////////////////////////////  Don't Touch  /////////////////////////
     setInterval(function(){
         initiate();
-        //fetchMovies();
       }, lynks.refreshRate);
    /////////////////////////////  Don't touch  /////////////////////////
 
@@ -49,6 +47,7 @@
         body: new URLSearchParams(lynks.mess)
       });
       const movies = await response.json();
+      console.log(movies);
       switch (movies.code) {
         case 200:
           if (movies.message == "clear"){
