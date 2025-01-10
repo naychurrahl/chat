@@ -16,6 +16,19 @@ CREATE TABLE `chat_init` (
   ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+---------------------------------------------------------
+---------   Tonigh  ------------------------------------- 
+---------------------------------------------------------
+CREATE TABLE `chat_test` (
+  `id`      int(4)        NOT NULL,
+  `target`  varchar(2050) NOT NULL,
+  `message` varchar(2050) NOT NULL,
+  `time`    varchar(16)   NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+---------------------------------------------------------
+---------------------------------------------------------
+
 CREATE TABLE `chat_messages` (
   `id`      int(4)        NOT NULL,
   `reciver` int(4)        NOT NULL,
@@ -45,7 +58,7 @@ CREATE TABLE `prod_desc` (
   FOREIGN KEY (`product`) REFERENCES `products`(`id`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `product_type` (`type`, `short`) VALUES
-  ('laptop', 'lpt'),
-  ('phone', 'phn');
+INSERT INTO `chat_teste` (`t`) VALUES
+  ('a'),
+  ('a');
 */

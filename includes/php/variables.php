@@ -6,7 +6,7 @@
     "status" => "unknown error!"
   ];
 
-  $ink = "http://127.0.0.1/dump/chat/init/?ad=";
+  $ink = "http://127.0.0.1/dump/chat/sand/init/?host=";
   $landing = "../";
 
   $table = [

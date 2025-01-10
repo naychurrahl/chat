@@ -2,10 +2,11 @@
 
   require_once("./includes/php/functions.php");
   session_start(['cookie_path' => '/', 'cookie_secure' => true, 'cookie_samesite' => 'none']);
-  if(isset($_SESSION["init"]) & $_SESSION["init"] == "auth" & isset($_SESSION['texts'])){
+  if(isset($_SESSION["init"])){
     ///////////////////// Variable Declaration ////////////////////////////////
       
-      $text = json_decode($_SESSION["texts"], true);
+      //print_r (json_decode($_SESSION['texts']));
+      $text = json_decode(messageDekrypt($_SESSION["texts"]), true);
 
     ///////////////////// Variable Declaration ////////////////////////////////
   } else {
@@ -31,7 +32,7 @@
         <div class="col-12">
           <div class="single-chat-tab">
             <div class="chat-body" id="ye">
-              <?php foreach ($text as $value) {echo textNode($value['message'], $value['time'], $value['sender']);}?>
+              <!--?php foreach ($text as $value) {echo textNode($value['message'], $value['time'], $value['sender']);}?-->
             </div>
             <div class="chat-footer">
               <div class="input-group md-form form-sm form-2 pl-0">
